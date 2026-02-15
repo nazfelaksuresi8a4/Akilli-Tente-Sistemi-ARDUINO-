@@ -22,7 +22,20 @@ void setup(){
 }
 
 void loop(){
- Serial.println("01");
+ int analog_value = analogRead(rainlevel_sensor);
+ int mapped_value = map(analog_value,0,250,0,1);
+ Serial.println(mapped_value);
+
+  if(mapped_value < 1){
+    digitalWrite(led_blue,LOW);
+    digitalWrite(led_red,HIGH);
+  }
+
+  else if(mapped_value > 0){
+    digitalWrite(led_red,LOW);
+    digitalWrite(led_blue,HIGH);
+  }
+
 }
 
 //Led Test fonksiyonu(ILK BAŞTA ÇALIŞACAK OLAN)
