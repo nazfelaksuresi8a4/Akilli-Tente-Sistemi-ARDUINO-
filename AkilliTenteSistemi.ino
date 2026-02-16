@@ -12,14 +12,22 @@ int rainlevel_sensor = A0;
 int btn_mod1 = 7;
 int btn_mod2 = 8;
 
+//Motorlar
+Servo x_servo;
+Servo y_servo;
+
+//Buzzerlar 
+int buzzer_1 = 5;
+
 //Durum değişkenleri
 int terim = 255;
 int sayac = 0;
 int kontrol_edildi = 0;
 
-//Motorlar
-Servo x_servo;
-Servo y_servo;
+int y_servo_deg = -180;
+int x_servo_deg = -180;
+
+
 
 void setup(){
   Serial.begin(9600);
@@ -32,6 +40,9 @@ void setup(){
   pinMode(btn_mod1,INPUT_PULLUP);
   pinMode(btn_mod2,INPUT_PULLUP);
 
+  //Buzzer pin modları
+  pinMode(buzzer_1,OUTPUT);
+
   //Motorları ata
   x_servo.attach(9);
   y_servo.attach(10);
@@ -43,8 +54,13 @@ void setup(){
   y_servo.write(16);
 
   //Test fonksiyonu başlat;
+  digitalWrite(buzzer_1,HIGH);
+  delay(1000);
+  digitalWrite(buzzer_1,LOW);
+  
   Serial.println("Fonksiyon başlatılıyor");
   ledTestFunction();
+  calibrate_servo();
 }
 
 void loop(){
@@ -54,10 +70,13 @@ void loop(){
   if(mapped_value < 1){
     digitalWrite(led_blue,LOW);
     digitalWrite(led_red,HIGH);
+    calibrate_servo();
   }
   else if(mapped_value > 0){
     digitalWrite(led_red,LOW);
     digitalWrite(led_blue,HIGH);
+    x_servo.write(+90);
+    y_servo.write(+90);
   }
 
   int btn_mod1_digital_state = digitalRead(btn_mod1);
@@ -70,14 +89,18 @@ void loop(){
   Serial.print("\n");
 
   if(btn_mod1_digital_state != 1 && btn_mod2_digital_state != 1){
-    calibrate_servo();
-    for(int nx = 0; nx < 2; nx ++){
-      x_servo.write(60);
-      y_servo.write(60);
-      delay(500);
-      x_servo.write(-60);
-      y_servo.write(-60);
+    for(int nx = 0; nx < 90; nx ++){
+      x_servo.write(x_servo_deg);
+      y_servo.write(y_servo_deg);
+
+      x_servo_deg ++;
+      y_servo_deg --;
+
+      delay(40);
+
+
     }
+    calibrate_servo();
   }
 }
 
@@ -109,9 +132,8 @@ void ledTestFunction(){
 }
 
 void calibrate_servo(){
-      int y_deg = y_servo.read();
-      int x_deg = x_servo.read();
-
-      y_servo.write(y_deg);
-      x_servo.write(x_deg);
+      y_servo_deg = 180;
+      x_servo_deg = 0;
+      y_servo.write(y_servo_deg);
+      x_servo.write(x_servo_deg);
 }
