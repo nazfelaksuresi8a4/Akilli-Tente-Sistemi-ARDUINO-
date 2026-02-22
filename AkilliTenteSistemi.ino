@@ -17,8 +17,14 @@ int lamp_3 = 9;
 Servo servo_x;
 Servo servo_y;
 
+//Buttons
+int button = 11;
+
 //Sensors
 int rainlevel_sensor = A0; 
+
+//potansiometers
+int pot = A1;
 
 //Static&Dynamic vals
 int maxval = 55;
@@ -39,6 +45,8 @@ void setup(){
   pinMode(lamp_2,OUTPUT);
   pinMode(lamp_3,OUTPUT);
   pinMode(rainlevel_sensor,INPUT);
+  pinMode(pot,INPUT);
+  pinMode(button,INPUT_PULLUP);
 
   //Servo attachs
   servo_x.attach(3);
@@ -54,7 +62,24 @@ void setup(){
 void loop(){
   int analog_rainlevel_sensor_value = analogRead(rainlevel_sensor);
   int mapped_analog_sensor_val = map(analog_rainlevel_sensor_value,1023,0,100,0);
-  Serial.println(mapped_analog_sensor_val); 
+  Serial.println(digitalRead(button));
+  
+  if(digitalRead(button) == 0){
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("ORAN AYARLA");
+    lcd.setCursor(0,1);
+    delay(1000);
+    while(digitalRead(button) == 1){
+      lcd.clear();
+      maxval = map(analogRead(pot),960,0,100,0);
+      lcd.print("maksimum: ");
+      lcd.print("%");
+      lcd.print(maxval);
+      delay(50);
+    }
+    lcd.clear();
+  }
 
   if(mapped_analog_sensor_val >= maxval){
     if(closed == false){
